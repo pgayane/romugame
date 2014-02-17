@@ -28,9 +28,8 @@ class Cat(pygame.sprite.Sprite):
 		self.rect = self.cat_pic.get_rect()
 		self.game = game
 
-		#print self.cat_pic.get_size()
-
 	def moveTo(self, loc_x):
+		''' gradually move to specified location'''
 		if self.rect.x<loc_x:
 			self.change_x = min(loc_x-self.rect.x, self.stepSize/2)
 		elif self.rect.x>loc_x:
@@ -54,24 +53,20 @@ class Cat(pygame.sprite.Sprite):
 	def drawAt(self, screen, loc):
 		screen.blit(self.cat_pic, loc)
 
-	def draw(self, screen, offset, printloc):
+	def draw(self, screen, offset):
 		screen.blit(self.cat_pic, [self.rect.left-offset, self.rect.top])
-		#pygame.draw.rect(screen, RED, [self.rect.left-offset, self.rect.y, self.rect.width, self.rect.height], 1)
-
-		if printloc:
-			font = pygame.font.Font(None, 25)
-			text = font.render(str(self.rect.right), True, DARK_ORANGE)
-			screen.blit(text, [200, 5])
 
 	def getSize(self):
 		return self.cat_pic.get_size()
 
 	def win(self, winPoint):
+		''' if the cat reach or passed the end sign then win '''
 		if self.rect.right > winPoint and self.rect.bottom >= self.game.ground_y:
 			return True
 		return False
 
 	def calc_grav(self):
+		''' calculates the vertical change of the object during the jump '''
 		if self.change_y == 0:
 			self.change_y = 1
 		else:
@@ -84,22 +79,26 @@ class Cat(pygame.sprite.Sprite):
 			
 
 	def jump(self):
+		''' if not currently in jump then jump '''
 		if self.change_y == 0:
 			self.direction = ''
 			self.change_y = -15
 
 	def jumpAndLeft(self):
+		''' if not currently jumping then jump and move to left '''
 		if self.change_y == 0:
 			self.direction = 'L'
 			self.change_y = -15
 
 	def jumpAndRight(self):
+		''' if not currently jumping then jump and move to right '''
+
 		if self.change_y == 0:
 			self.direction = 'R'
 			self.change_y = -15
 
 	def displayLives(self):
-		
+		''' on the info bar displays how many lives are left '''
 		margin = 5
 	
 		font = pygame.font.Font(None, 30)
@@ -114,6 +113,8 @@ class Cat(pygame.sprite.Sprite):
 		return self.lives>0
 
 	def update(self):
+		''' updates location of the objected based on the vertical and horizontal chnage taking into account collisons '''
+		
 		# Gravity
 		self.calc_grav()
 	

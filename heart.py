@@ -17,6 +17,7 @@ class Heart:
 		self.game = game
 
 	def update(self):
+		''' bubble up the heart untill it reaches the top of the screen'''
 		speed = 5
 		if self.rect.bottom - speed >=0:
 			self.rect.bottom -=speed
