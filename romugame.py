@@ -1,9 +1,11 @@
+# -*- coding: latin-1 -*-
+
 import pygame
 from cat import Cat
-from player import Player
 from colors import * 
 import datetime as dt
 from cactus import Cactus
+from heart import Heart
 
 class RomuGame:
 
@@ -17,18 +19,18 @@ class RomuGame:
 	romu  = None
 	initTime = None
 	screen = None
-	win_point = 3700
+	win_point = 3400
 
 	def __init__(self):
 		self.screen = pygame.display.set_mode(self.screen_size)
 	
-		self.romu = Cat(self)		
+		self.romu = Cat(self, True)		
 		self.romu.setStepSize(10)
 		self.romu.setLocation([0, self.ground_y])
 	
-		for i in range(1,8):
+		for i in range(1,9):
 			cactus = Cactus(self)
-			cactus.setLocation([500*i, self.ground_y])
+			cactus.setLocation([420*i, self.ground_y])
 			self.cactus_list.append(cactus)
 
 	
@@ -38,7 +40,7 @@ class RomuGame:
 		done = False
 		clock = pygame.time.Clock()
 	
-		#self.displayStartFrame(self.ground_y, clock)
+		self.displayStartFrame(self.ground_y, clock)
 		
 		self.initTime = dt.datetime.now()
 
@@ -76,7 +78,7 @@ class RomuGame:
 			self.drawGameOver()
 
 		if self.romu.win(self.win_point):
-			print "won the game"
+			self.drawWinGame()
 		pygame.quit()
 
 	def draw(self):
@@ -98,18 +100,107 @@ class RomuGame:
 			#Draw everything 		
 			self.draw_background(self.ground_y, visible_x1)
 			self.romu.update()
-			self.romu.draw(self.screen, visible_x1)
+			self.romu.draw(self.screen, visible_x1, True)
 
 			for cactus in self.cactus_list:
 				cactus.draw(self.screen, visible_x1)
 
+			self.drawEnd(self.win_point-visible_x1)
+
 			self.romu.displayLives()
 			self.displayTime(dt.datetime.now()-self.initTime)
-			
-			self.drawEnd(self.win_point-visible_x1)
+				
 
 			pygame.display.flip()
 
+	def drawWinGame(self):
+		done  = False
+		clock = pygame.time.Clock()
+		
+		romu_end_right = self.win_point+300
+		minou_end_left = self.win_point+300
+
+		minou = Cat(self, False)
+		minou.setStepSize(10)
+		minou.setLocation([4000-minou.rect.width, self.ground_y])
+
+		offset = 3300
+		clock = pygame.time.Clock()
+		met = False
+
+		while not done and not met:
+			for event in pygame.event.get(): 
+				if event.type == pygame.QUIT: 
+					done = True 
+
+			self.draw_background(self.screen, self.ground_y)
+			
+
+			self.romu.moveTo(romu_end_right-self.romu.rect.width)
+			minou.moveTo(minou_end_left)
+
+			self.romu.update()
+			self.romu.draw(self.screen, offset, True)
+
+			minou.update()
+			minou.draw(self.screen, offset, False)
+
+			self.drawEnd(self.win_point-offset)
+
+			self.romu.displayLives()
+			self.displayTime(dt.datetime.now()-self.initTime)
+			
+			if self.romu.rect.right == romu_end_right and minou.rect.left == minou_end_left:
+				met = True
+			pygame.display.flip()
+
+			clock.tick(20)
+
+		hearts_list = []
+		for i in range(0,15):
+			hearts_list.append(Heart(self, [3600, 200, 200, 200]))
+
+		while not done:
+			for event in pygame.event.get(): 
+				if event.type == pygame.QUIT: 
+					done = True 
+
+			self.draw_background(self.screen, self.ground_y)
+			
+
+			self.romu.draw(self.screen, offset, True)
+			minou.draw(self.screen, offset, False)
+
+			self.drawEnd(self.win_point-offset)
+
+			self.romu.displayLives()
+			self.displayTime(dt.datetime.now()-self.initTime)
+			
+			
+
+			start_rect = [260, 70, 320, 110]
+			pygame.draw.rect(self.screen, WHITE, start_rect)
+			pygame.draw.rect(self.screen, RED, start_rect, 4)
+		
+			font = pygame.font.Font(None, 30)
+			text = font.render(unicode("Tu as gagné mon cœur", 'utf-8'), True, RED)
+			self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], start_rect[1] + 10])
+
+			text = font.render("Je ne peux pas vivre sans toi", True, RED)
+			self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], start_rect[1] + 45])
+
+			text = font.render("Merci pour etre mon Valentine", True, RED)
+			self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], start_rect[1] + 80])
+
+			for heart in hearts_list:
+				heart.update()
+				heart.draw(offset)
+
+			pygame.display.flip()
+
+			clock.tick(10)
+
+	
 	def drawGameOver(self):
 		x_margin  = 5
 		y_margin  = 20

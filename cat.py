@@ -15,16 +15,26 @@ class Cat(pygame.sprite.Sprite):
 	lives = 7
 	injury_timestamp = None
 
-	def __init__(self, game):
+	def __init__(self, game, isHero):
 		pygame.sprite.Sprite.__init__(self) 
 
-		self.cat_pic = pygame.image.load("resources/romu.png").convert()
+		if isHero :
+			self.cat_pic = pygame.image.load("resources/romu.png").convert()
+		else:
+			self.cat_pic = pygame.image.load("resources/minou.png").convert()
+
 		self.cat_pic.set_colorkey(WHITE)
 
 		self.rect = self.cat_pic.get_rect()
 		self.game = game
 
 		#print self.cat_pic.get_size()
+
+	def moveTo(self, loc_x):
+		if self.rect.x<loc_x:
+			self.change_x = min(loc_x-self.rect.x, self.stepSize/2)
+		elif self.rect.x>loc_x:
+			self.change_x = -min(self.rect.x-loc_x, self.stepSize/2)
 
  	def setLocation(self, newLoc):
 		self.rect.bottomleft = newLoc
@@ -44,19 +54,20 @@ class Cat(pygame.sprite.Sprite):
 	def drawAt(self, screen, loc):
 		screen.blit(self.cat_pic, loc)
 
-	def draw(self, screen, offset):
+	def draw(self, screen, offset, printloc):
 		screen.blit(self.cat_pic, [self.rect.left-offset, self.rect.top])
 		#pygame.draw.rect(screen, RED, [self.rect.left-offset, self.rect.y, self.rect.width, self.rect.height], 1)
 
-		font = pygame.font.Font(None, 25)
-		text = font.render(str(self.rect.right), True, DARK_ORANGE)
-		screen.blit(text, [200, 5])
+		if printloc:
+			font = pygame.font.Font(None, 25)
+			text = font.render(str(self.rect.right), True, DARK_ORANGE)
+			screen.blit(text, [200, 5])
 
 	def getSize(self):
 		return self.cat_pic.get_size()
 
 	def win(self, winPoint):
-		if self.rect.right > winPoint and self.change_y == 0:
+		if self.rect.right > winPoint and self.rect.bottom >= self.game.ground_y:
 			return True
 		return False
 
