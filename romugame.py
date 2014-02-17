@@ -6,6 +6,8 @@ from colors import *
 import datetime as dt
 from cactus import Cactus
 from heart import Heart
+from tree import Tree
+import random
 
 class RomuGame:
 
@@ -15,6 +17,7 @@ class RomuGame:
 	score = 0
 
 	cactus_list = []
+	trees_list = []
 
 	romu  = None
 	initTime = None
@@ -32,6 +35,12 @@ class RomuGame:
 			cactus = Cactus(self)
 			cactus.setLocation([420*i, self.ground_y])
 			self.cactus_list.append(cactus)
+
+		number_of_trees = 24	
+		tree_width = self.path_size/number_of_trees
+		for i in xrange(0,number_of_trees):
+			tree = Tree(self, i, tree_width)
+			self.trees_list.append(tree)
 
 	
 	def run(self):
@@ -313,29 +322,8 @@ class RomuGame:
 		pygame.draw.rect(self.screen, SKY_COLOR, [x, y, width, height])
 
 		# draw trees
-		number_of_trees = 24	
-		tree_root_height = self.ground_y/3
-		root_width = 20 
-		
-
-		for i in xrange(0,number_of_trees):
-			# tree root
-			x = i*self.path_size/number_of_trees + (self.path_size/number_of_trees)/2 - root_width/2 - offset
-			y = self.ground_y - tree_root_height - 5
-			width = root_width
-			height = tree_root_height +5
-			if x+width> 0 and x <=screen_width:
-				pygame.draw.rect(self.screen, TREE_ROOT, [x, y, width, height])
-			
-			# tree leaves
-			leaves_width = self.path_size/number_of_trees - 30
-			x = i*self.path_size/number_of_trees + (self.path_size/number_of_trees)/2  - leaves_width/2 - offset
-			y = 0
-			width = leaves_width
-			height = self.ground_y - tree_root_height
-			if x+width>0  and x <=screen_width:
-				pygame.draw.ellipse(self.screen, DARK_GREEN, [x, y, width, height])
-		
+		for tree in self.trees_list:
+			tree.draw(offset)
 		# draw info bar
 		x = 0
 		y = 0
