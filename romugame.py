@@ -85,7 +85,7 @@ class RomuGame:
 
 			self.draw()
 			
-			clock.tick(30)	
+			clock.tick(20)	
 
 		if not self.romu.isAlive():
 			self.drawGameOver()
@@ -174,6 +174,9 @@ class RomuGame:
 
 		# after romu and minou met creat hearts and move them up as bubbles
 		# also draw the Valentine's day message
+		kiss_sound = pygame.mixer.Sound("resources/kiss.wav")
+		kiss_sound.play()
+
 		hearts_list = []
 		for i in range(0,15):
 			hearts_list.append(Heart(self, [3600, 200, 200, 200]))
@@ -235,7 +238,7 @@ class RomuGame:
 
 			self.drawBackground(self.screen, self.ground_y)
 
-			stBt_rect = [130, 70, 445, 360]
+			start_rect = [130, 70, 445, 360]
 			pygame.draw.rect(self.screen, WHITE, start_rect)
 			pygame.draw.rect(self.screen, DARK_ORANGE, start_rect, 2)
 			

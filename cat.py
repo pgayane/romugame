@@ -114,7 +114,7 @@ class Cat(pygame.sprite.Sprite):
 
 	def update(self):
 		''' updates location of the objected based on the vertical and horizontal chnage taking into account collisons '''
-		
+
 		# Gravity
 		self.calc_grav()
 	
@@ -128,7 +128,7 @@ class Cat(pygame.sprite.Sprite):
 				self.change_x = -self.stepSize
 
 		if self.rect.x + self.change_x < 0 or self.rect.right + self.change_x >= self.game.path_size:
-			bump_sound = pygame.mixer.Sound("resources/bump.wav")
+			bump_sound = pygame.mixer.Sound("resources/meow1.wav")
 			bump_sound.play()			
 		else:
 
@@ -136,10 +136,9 @@ class Cat(pygame.sprite.Sprite):
 			cactus_hit_list = pygame.sprite.spritecollide(self, self.game.cactus_list, False)
 
 			if len(cactus_hit_list) > 0 :
-				bump_sound = pygame.mixer.Sound("resources/bump.wav")
-				bump_sound.play()
-
 				if self.injury_timestamp == None or time.time() - self.injury_timestamp > 1:
+					bump_sound = pygame.mixer.Sound("resources/meow1.wav")
+					bump_sound.play()
 					self.lives -=1
 					self.injury_timestamp = time.time()
 
