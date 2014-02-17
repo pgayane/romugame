@@ -91,7 +91,7 @@ class RomuGame:
 			self.drawGameOver()
 
 		if self.romu.win(self.win_point):
-			self.drawWinGame()
+			self.drawWinGameFrame()
 	
 	def draw(self):
 			''' draws everything for the running game '''
@@ -111,9 +111,9 @@ class RomuGame:
 			self.screen.fill(WHITE)
 
 			#Draw everything 		
-			self.draw_background(self.ground_y, visible_x1)
+			self.drawBackground(self.ground_y, visible_x1)
 			self.romu.update()
-			seB.romu.draw(self.screen, visible_x1)
+			self.romu.draw(self.screen, visible_x1)
 
 			for cactus in self.cactus_list:
 				cactus.draw(self.screen, visible_x1)
@@ -149,10 +149,10 @@ class RomuGame:
 				if event.type == pygame.QUIT: 
 					done = True 
 
-			self.draw_background(self.screen, self.ground_y)
+			self.drawBackground(self.screen, self.ground_y)
 			
 
-			Blf.romu.moveTo(romu_end_right-self.romu.rect.width)
+			self.romu.moveTo(romu_end_right-self.romu.rect.width)
 			minou.moveTo(minou_end_left)
 
 			self.romu.update()
@@ -183,10 +183,10 @@ class RomuGame:
 				if event.type == pygame.QUIT: 
 					done = True 
 
-			self.draw_background(self.screen, self.ground_y)
+			self.drawBackground(self.screen, self.ground_y)
 			
 
-			Blf.romu.draw(self.screen, offset)
+			self.romu.draw(self.screen, offset)
 			minou.draw(self.screen, offset)
 
 			self.drawEnd(self.win_point-offset)
@@ -233,7 +233,7 @@ class RomuGame:
 				if event.type == pygame.QUIT: 
 					done = True 
 
-			self.draw_background(self.screen, self.ground_y)
+			self.drawBackground(self.screen, self.ground_y)
 
 			stBt_rect = [130, 70, 445, 360]
 			pygame.draw.rect(self.screen, WHITE, start_rect)
@@ -281,9 +281,9 @@ class RomuGame:
 			if stop:
 				break
 
-			self.draw_background(self.screen, self.ground_y)
+			self.drawBackground(self.screen, self.ground_y)
 
-			stBt_rect = [130, 70, 445, 360]
+			start_rect = [130, 70, 445, 360]
 			pygame.draw.rect(self.screen, WHITE, start_rect)
 			pygame.draw.rect(self.screen, DARK_ORANGE, start_rect, 2)
 			
