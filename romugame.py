@@ -45,12 +45,15 @@ class RomuGame:
 	
 	def run(self):
 	
-	
+		self.showStartFrame(self.ground_y)
+		self.startGame()
+
+		pygame.quit()
+
+	def startGame(self):
 		done = False
 		clock = pygame.time.Clock()
 	
-		self.displayStartFrame(self.ground_y, clock)
-		
 		self.initTime = dt.datetime.now()
 
 		while self.romu.isAlive() and not done and not self.romu.win(self.win_point):
@@ -81,15 +84,14 @@ class RomuGame:
 
 			self.draw()
 			
-			clock.tick(30)
+			clock.tick(30)	
 
 		if not self.romu.isAlive():
 			self.drawGameOver()
 
 		if self.romu.win(self.win_point):
 			self.drawWinGame()
-		pygame.quit()
-
+	
 	def draw(self):
 			
 			cat_loc = self.romu.rect.centerx
@@ -216,7 +218,6 @@ class RomuGame:
 		done  = False
 		clock = pygame.time.Clock()
 	
-
 		while not done:
 			for event in pygame.event.get(): 
 				if event.type == pygame.QUIT: 
@@ -248,10 +249,24 @@ class RomuGame:
 
 		pygame.draw.rect(self.screen, BLACK, [loc_x - 2, 300, 4, 150])
 	
-	def displayStartFrame(self, ground_y, clock):
+	def showStartFrame(self, ground_y):
+
+		clock = pygame.time.Clock()
+
 		x_margin  = 5
 		y_margin  = 20
+		stop = False
+
 		for wait in range(10, 0, -1):
+
+			for event in pygame.event.get(): 
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_RETURN:
+						stop = True
+
+			if stop:
+				break
+
 			self.draw_background(self.screen, self.ground_y)
 
 			start_rect = [130, 70, 445, 360]
