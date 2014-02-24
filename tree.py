@@ -4,13 +4,6 @@ import random
 
 class Tree:
 
-	tree_root_height = 0
-	leaves_height = 0
-	game = None
-	root_width = 20 
-	index = 0
-	margin = 0
-	tree_width = 0
 	def __init__(self, game, index, tree_width):
 		''' create a tree with random size '''
 
@@ -25,6 +18,8 @@ class Tree:
 
 		self.tree_root_height = random.randint(min_root_height, max_root_height)
 		self.leaves_height = random.randint(min_leaves_height, max_leaves_height)
+
+		self.root_width = 20 
 
  	def draw(self, offset):		
  		''' draws the tree with predetermined size '''
@@ -46,5 +41,5 @@ class Tree:
 		if x+width>0  and x <=self.game.screen.get_size()[0]:
 			pygame.draw.ellipse(self.game.screen, DARK_GREEN, [x, y, width, height])
 
-	def getSize(self):
+	def get_size(self):
 		return self.pic.get_size()

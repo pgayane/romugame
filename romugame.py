@@ -11,34 +11,27 @@ import random
 
 class RomuGame:
 
-	screen_size = (700, 500)
-	path_size = 4000
-	ground_y = screen_size[1] * 0.9
-	score = 0
-
-	cactus_list = []
-	trees_list = []
-
-	romu  = None
-	initTime = None
-	screen = None
-	win_point = 3400
-
 	def __init__(self):
 		''' generates all the objects necessary for the game '''
 
+		#init instance variables
+		self.screen_size = (700, 500)
+		self.path_size = 4000
+		self.ground_y = self.screen_size[1] * 0.9
+		self.init_time = None
+		self.win_point = 3400
+
 		self.screen = pygame.display.set_mode(self.screen_size)
 	
-		self.romu = Cat(self, True)		
-		self.romu.setStepSize(10)
-		self.romu.setLocation([0, self.ground_y])
+		self.romu = Cat(self, Cat.ROMU_PATH, [0, self.ground_y])		
 	
+		self.cactus_list = []
 		for i in range(1,9):
-			cactus = Cactus(self)
-			cactus.setLocation([420*i, self.ground_y])
+			cactus = Cactus(self, [420*i, self.ground_y])
 			self.cactus_list.append(cactus)
 
 		number_of_trees = 24	
+		self.trees_list = []
 		tree_width = self.path_size/number_of_trees
 		for i in xrange(0,number_of_trees):
 			tree = Tree(self, i, tree_width)
@@ -46,52 +39,32 @@ class RomuGame:
 
 	
 	def run(self):
-		self.showStartFrame(self.ground_y)
-		self.startGame()
+		self.show_start_frame(self.ground_y)
+		self.start_game()
 
-	def startGame(self):
+	def start_game(self):
 		''' runs the actual game '''
 
 		done = False
 		clock = pygame.time.Clock()
 	
-		self.initTime = dt.datetime.now()
+		self.init_time = dt.datetime.now()
 
-		while self.romu.isAlive() and not done and not self.romu.win(self.win_point):
+		while self.romu.is_alive() and not done and not self.romu.win(self.win_point):
 			for event in pygame.event.get(): 
 				if event.type == pygame.QUIT: 
 					done = True 
-				if event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_RIGHT:
-						self.romu.moveForward()
-					if event.key == pygame.K_LEFT:
-						self.romu.moveBackwards()
-					if event.key == pygame.K_SPACE:
-						keys_pressed = pygame.key.get_pressed()
-						if keys_pressed[pygame.K_LEFT]:
-							self.romu.jumpAndLeft()
-						elif keys_pressed[pygame.K_RIGHT]:
-							self.romu.jumpAndRight()						
-						else:
-							self.romu.jump()
-						
 
-			keys_pressed = pygame.key.get_pressed()
-
-			if keys_pressed[pygame.K_LEFT]:
-				self.romu.moveBackwards()
-			if keys_pressed[pygame.K_RIGHT]:
-				self.romu.moveForward()
-
+			self.romu.key_presses(pygame.key.get_pressed())
 			self.draw()
-			
+		
 			clock.tick(20)	
 
-		if not self.romu.isAlive():
-			self.drawGameOver()
+		if not self.romu.is_alive():
+			self.draw_game_over()
 
 		if self.romu.win(self.win_point):
-			self.drawWinGameFrame()
+			self.draw_win_game_frame()
 	
 	def draw(self):
 			''' draws everything for the running game '''
@@ -111,33 +84,33 @@ class RomuGame:
 			self.screen.fill(WHITE)
 
 			#Draw everything 		
-			self.drawBackground(self.ground_y, visible_x1)
+			self.draw_background(self.ground_y, visible_x1)
+
+			self.draw_end(self.win_point-visible_x1)
+
+
 			self.romu.update()
 			self.romu.draw(self.screen, visible_x1)
 
 			for cactus in self.cactus_list:
 				cactus.draw(self.screen, visible_x1)
 
-			self.drawEnd(self.win_point-visible_x1)
-
-			self.romu.displayLives()
-			self.displayTime(dt.datetime.now()-self.initTime)
+			
+			self.romu.display_lives()
+			self.display_time(dt.datetime.now()-self.init_time)
 				
 
 			pygame.display.flip()
 
-	def drawWinGameFrame(self):
+	def draw_win_game_frame(self):
 		''' draws the animation after the user won the game '''
 
 		done  = False
 		clock = pygame.time.Clock()
+	
+		self.romu.set_location([self.win_point + 20, self.ground_y + 20])
+		minou = Cat(self, Cat.MINOU_PATH, [self.path_size-self.romu.rect.width, self.ground_y])
 		
-		romu_end_right = self.win_point+300
-		minou_end_left = self.win_point+300
-
-		minou = Cat(self, False)
-		minou.setStepSize(10)
-		minou.setLocation([4000-minou.rect.width, self.ground_y])
 
 		offset = 3300
 		clock = pygame.time.Clock()
@@ -149,25 +122,26 @@ class RomuGame:
 				if event.type == pygame.QUIT: 
 					done = True 
 
-			self.drawBackground(self.screen, self.ground_y)
+			self.draw_background(self.screen, self.ground_y)
 			
 
-			self.romu.moveTo(romu_end_right-self.romu.rect.width)
-			minou.moveTo(minou_end_left)
+			self.romu.moveTo(self.win_point+300-self.romu.rect.width)
+			minou.moveTo(self.win_point+300)
 
 			self.romu.update()
 			self.romu.draw(self.screen, offset)
-
+			
 			minou.update()
 			minou.draw(self.screen, offset)
 
-			self.drawEnd(self.win_point-offset)
+			self.draw_end(self.win_point-offset)
 
-			self.romu.displayLives()
-			self.displayTime(dt.datetime.now()-self.initTime)
-			
-			if self.romu.rect.right == romu_end_right and minou.rect.left == minou_end_left:
+			self.romu.display_lives()
+			self.display_time(dt.datetime.now()-self.init_time)
+
+			if abs(self.romu.rect.right - minou.rect.left) < self.romu.step_size:
 				met = True
+
 			pygame.display.flip()
 
 			clock.tick(20)
@@ -186,32 +160,32 @@ class RomuGame:
 				if event.type == pygame.QUIT: 
 					done = True 
 
-			self.drawBackground(self.screen, self.ground_y)
+			self.draw_background(self.screen, self.ground_y)
 			
 
 			self.romu.draw(self.screen, offset)
 			minou.draw(self.screen, offset)
 
-			self.drawEnd(self.win_point-offset)
+			self.draw_end(self.win_point-offset)
 
-			self.romu.displayLives()
-			self.displayTime(dt.datetime.now()-self.initTime)
+			self.romu.display_lives()
+			self.display_time(dt.datetime.now()-self.init_time)
 			
 
 
-			start_rect = [260, 70, 320, 110]
-			pygame.draw.rect(self.screen, WHITE, start_rect)
-			pygame.draw.rect(self.screen, RED, start_rect, 4)
+			# start_rect = [260, 70, 320, 110]
+			# pygame.draw.rect(self.screen, WHITE, start_rect)
+			# pygame.draw.rect(self.screen, RED, start_rect, 4)
 		
-			font = pygame.font.Font(None, 30)
-			text = font.render(unicode("Tu as gagné mon cœur", 'utf-8'), True, RED)
-			self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], start_rect[1] + 10])
+			# font = pygame.font.Font(None, 30)
+			# text = font.render(unicode("Tu as gagné mon cœur", 'utf-8'), True, RED)
+			# self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], start_rect[1] + 10])
 
-			text = font.render("Je ne peux pas vivre sans toi", True, RED)
-			self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], start_rect[1] + 45])
+			# text = font.render("Je ne peux pas vivre sans toi", True, RED)
+			# self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], start_rect[1] + 45])
 
-			text = font.render("Merci pour etre mon Valentine", True, RED)
-			self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], start_rect[1] + 80])
+			# text = font.render("Merci pour etre mon Valentine", True, RED)
+			# self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], start_rect[1] + 80])
 
 			for heart in hearts_list:
 				heart.update()
@@ -223,7 +197,7 @@ class RomuGame:
 
 	
 	
-	def drawGameOver(self):
+	def draw_game_over(self):
 		''' draws a rectangle with the 'Game Over' messgae '''
 
 		x_margin  = 5
@@ -236,7 +210,7 @@ class RomuGame:
 				if event.type == pygame.QUIT: 
 					done = True 
 
-			self.drawBackground(self.screen, self.ground_y)
+			self.draw_background(self.screen, self.ground_y)
 
 			start_rect = [130, 70, 445, 360]
 			pygame.draw.rect(self.screen, WHITE, start_rect)
@@ -250,7 +224,7 @@ class RomuGame:
 
 			clock.tick(1)
 
-	def drawEnd(self, loc_x):
+	def draw_end(self, loc_x):
 		''' draws the dimond end sign '''
 
 		pointlist = [[loc_x-100, 200],[loc_x, 100],[loc_x +100, 200], [loc_x, 300]]
@@ -264,7 +238,7 @@ class RomuGame:
 
 		pygame.draw.rect(self.screen, BLACK, [loc_x - 2, 300, 4, 150])
 	
-	def showStartFrame(self, ground_y):
+	def show_start_frame(self, ground_y):
 		''' shows a flash screen in the beginning of the game 
 		countdown to start the game or hit 'ENTER' '''
 
@@ -284,7 +258,7 @@ class RomuGame:
 			if stop:
 				break
 
-			self.drawBackground(self.screen, self.ground_y)
+			self.draw_background(self.screen, self.ground_y)
 
 			start_rect = [130, 70, 445, 360]
 			pygame.draw.rect(self.screen, WHITE, start_rect)
@@ -297,7 +271,7 @@ class RomuGame:
 			y +=text.get_size()[1]
 
 			font = pygame.font.Font(None, 30)
-			text = font.render("the world of the most advantures cat", True, DARK_ORANGE)
+			text = font.render("the world of the most advanturous cat", True, DARK_ORANGE)
 			self.screen.blit(text, [start_rect[2]/2-text.get_size()[0]/2 + start_rect[0], y + y_margin])
 			y +=text.get_size()[1]
 
@@ -327,7 +301,7 @@ class RomuGame:
 			clock.tick(1)
 
 
-	def displayTime(self, time):
+	def display_time(self, time):
 			''' on the top info bar displays how much time passed after the game started '''
 			x_margin = 5
 			font = pygame.font.Font(None, 25)
@@ -335,7 +309,7 @@ class RomuGame:
 			self.screen.blit(text, [x_margin, x_margin])
 		
 
-	def drawBackground(self, ground_y, offset):
+	def draw_background(self, ground_y, offset):
 		''' draws the background, info bar and the platform on which hero walks '''
 
 		screen_width = self.screen.get_size()[0]

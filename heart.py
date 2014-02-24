@@ -4,8 +4,6 @@ from colors import *
 
 class Heart:
 
-	game = None
-
 	def __init__(self, game, rect):
 		x = random.randint(rect[0], rect[0] + rect[2])
 		y = random.randint(rect[1], rect[1] + rect[3])
@@ -25,5 +23,5 @@ class Heart:
 	def draw(self, offset):
 		self.game.screen.blit(self.pic, [self.rect.left-offset, self.rect.top])
 		
-	def getSize(self):
+	def get_size(self):
 		return self.pic.get_size()
