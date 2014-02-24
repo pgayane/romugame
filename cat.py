@@ -159,7 +159,6 @@ class Cat(pygame.sprite.Sprite):
 		# Move left/right during a jump
 		self.handle_sidewise_jump()
 
-		
 		# checks the collision only based on the x, because there are no obsticles located vertically to cat
 		self.check_offscreen()
 		self.check_collision_with_cactus()
